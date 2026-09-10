@@ -1,5 +1,6 @@
 package com.dannialima.taskboard.service;
 
+import com.dannialima.taskboard.dto.TaskResponseDTO;
 import com.dannialima.taskboard.exception.ResourceNotFoundException;
 import com.dannialima.taskboard.model.Task;
 import com.dannialima.taskboard.model.TaskStatus;
@@ -44,5 +45,18 @@ public class TaskService {
             throw new ResourceNotFoundException("Task not found with id: " + id);
         }
         taskRepository.deleteById(id);
+    }
+
+    public TaskResponseDTO toResponseDTO(Task task) {
+        return new TaskResponseDTO(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getStatus(),
+                task.getPriority(),
+                task.getDueDate(),
+                task.getCreatedAt(),
+                task.getUpdatedAt()
+        );
     }
 }
