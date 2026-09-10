@@ -12,7 +12,7 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "O título é obrigatório")
+    @NotBlank(message = "The title is mandatory.")
     @Column(nullable = false)
     private String title;
 
