@@ -1,5 +1,6 @@
 package com.dannialima.taskboard.service;
 
+import com.dannialima.taskboard.exception.ResourceNotFoundException;
 import com.dannialima.taskboard.model.Task;
 import com.dannialima.taskboard.model.TaskStatus;
 import com.dannialima.taskboard.repository.TaskRepository;
@@ -25,6 +26,11 @@ public class TaskService {
         return taskRepository.findById(id);
     }
 
+    public Task findByIdOrThrow(Long id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+    }
+
     public List<Task> findByStatus(TaskStatus status) {
         return taskRepository.findByStatus(status);
     }
@@ -34,6 +40,9 @@ public class TaskService {
     }
 
     public void deleteById(Long id) {
+        if (!taskRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Task not found with id: " + id);
+        }
         taskRepository.deleteById(id);
     }
 }

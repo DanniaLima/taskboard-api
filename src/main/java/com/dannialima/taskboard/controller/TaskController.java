@@ -21,48 +21,42 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks(@RequestParam(required = false) TaskStatus status) {
+    public List<Task> getAllTasks(@RequestParam(required = false) TaskStatus status) {
         if (status != null) {
-            return ResponseEntity.ok(taskService.findByStatus(status));
+            return taskService.findByStatus(status);
         }
-        return ResponseEntity.ok(taskService.findAll());
+        return taskService.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
-        return taskService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Task task = taskService.findByIdOrThrow(id);
+        return ResponseEntity.ok(task);
     }
 
     @PostMapping
     public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
-        Task createdTask = taskService.save(task);
-        return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
+        Task savedTask = taskService.save(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody Task taskDetails) {
-        return taskService.findById(id)
-                .map(existingTask -> {
-                    existingTask.setTitle(taskDetails.getTitle());
-                    existingTask.setDescription(taskDetails.getDescription());
-                    existingTask.setStatus(taskDetails.getStatus());
-                    existingTask.setPriority(taskDetails.getPriority());
-                    existingTask.setDueDate(taskDetails.getDueDate());
-                    Task updatedTask = taskService.save(existingTask);
-                    return ResponseEntity.ok(updatedTask);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Task existingTask = taskService.findByIdOrThrow(id);
+
+        existingTask.setTitle(taskDetails.getTitle());
+        existingTask.setDescription(taskDetails.getDescription());
+        existingTask.setStatus(taskDetails.getStatus());
+        existingTask.setPriority(taskDetails.getPriority());
+        existingTask.setDueDate(taskDetails.getDueDate());
+
+        Task updatedTask = taskService.save(existingTask);
+        return ResponseEntity.ok(updatedTask);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        return taskService.findById(id)
-                .map(task -> {
-                    taskService.deleteById(id);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        taskService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
