@@ -14,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import java.util.List;
 
 @RestController
@@ -27,14 +31,18 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @Operation(summary = "List tasks", description = "Retrieves all tasks or filters them by the provided status.")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved task list")
+    @Operation(
+            summary = "List tasks (paginated)",
+            description = "Retrieves a paginated list of tasks, optionally filtered by status. " +
+                    "Supports query params: page, size, sort."
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated task list")
     @GetMapping
-    public ResponseEntity<List<TaskResponseDTO>> getAllTasks(@RequestParam(required = false) TaskStatus status) {
-        List<Task> tasks = (status != null) ? taskService.findByStatus(status) : taskService.findAll();
-        List<TaskResponseDTO> response = tasks.stream()
-                .map(taskService::toResponseDTO)
-                .toList();
+    public ResponseEntity<Page<TaskResponseDTO>> getAllTasks(
+            @RequestParam(required = false) TaskStatus status,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<TaskResponseDTO> response = taskService.getTasksPaginated(status, pageable);
         return ResponseEntity.ok(response);
     }
 

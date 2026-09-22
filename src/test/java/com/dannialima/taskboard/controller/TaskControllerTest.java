@@ -17,12 +17,15 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -63,15 +66,30 @@ class TaskControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/tasks should return 200 with the task list")
-    void shouldReturnAllTasks() throws Exception {
-        when(taskService.findAll()).thenReturn(List.of(task));
-        when(taskService.toResponseDTO(task)).thenReturn(responseDTO);
+    @DisplayName("GET /api/tasks should return 200 with a paginated task list")
+    void shouldReturnPaginatedTasks() throws Exception {
+        Page<TaskResponseDTO> page = new PageImpl<>(List.of(responseDTO));
+
+        when(taskService.getTasksPaginated(any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/tasks"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].title").value("Test Task"));
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Test Task"))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    @DisplayName("GET /api/tasks?status=PENDING should filter by status")
+    void shouldReturnPaginatedTasksFilteredByStatus() throws Exception {
+        Page<TaskResponseDTO> page = new PageImpl<>(List.of(responseDTO));
+
+        when(taskService.getTasksPaginated(eq(TaskStatus.PENDING), any())).thenReturn(page);
+
+        mockMvc.perform(get("/api/tasks").param("status", "PENDING"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].status").value("PENDING"));
     }
 
     @Test
