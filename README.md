@@ -8,6 +8,7 @@ This project was built as a backend portfolio piece to demonstrate REST API desi
 
 - Full CRUD for tasks (create, read, update, delete)
 - Filtering tasks by status (`GET /api/tasks?status=PENDING`)
+- Pagination and sorting for the listing endpoint (`GET /api/tasks?page=0&size=10&sort=dueDate,asc`)
 - Request validation with Bean Validation (`@NotBlank`, `@Size`, `@NotNull`, `@FutureOrPresent`)
 - Standardized error responses following **RFC 7807 (ProblemDetail)**
 - Interactive API documentation with **Swagger / OpenAPI 3**
@@ -60,7 +61,7 @@ Controller  →  Service  →  Repository  →  Database
 
 | Method | Endpoint              | Description                       |
 |--------|------------------------|------------------------------------|
-| GET    | `/api/tasks`           | List all tasks (optional `status` filter) |
+| GET    | `/api/tasks`           | List all tasks (paginated, optional `status` filter) |
 | GET    | `/api/tasks/{id}`      | Get a task by ID                   |
 | POST   | `/api/tasks`           | Create a new task                  |
 | PUT    | `/api/tasks/{id}`      | Update an existing task            |
@@ -135,7 +136,9 @@ http://localhost:8080/swagger-ui/index.html
 ./mvnw test
 ```
 
-Unit tests cover the service layer, including entity-to-DTO conversion, exception handling for missing resources, and repository interaction verification with Mockito.
+Tests cover both layers:
+- **Service layer** with JUnit 5 + Mockito (business logic, entity-to-DTO conversion, exception handling, repository interactions)
+- **Controller layer** with MockMvc (HTTP status codes, JSON contracts, validation errors, exception → status mapping)
 
 ## Project Structure
 
@@ -166,8 +169,8 @@ taskboard-api/
 - [x] Swagger / OpenAPI documentation
 - [x] DTO-based contracts (no entity exposure)
 - [x] Unit tests for the service layer
-- [ ] Controller layer tests with MockMvc
-- [ ] Pagination and sorting for the listing endpoint
+- [x] Controller layer tests with MockMvc
+- [x] Pagination and sorting for the listing endpoint
 
 ## Author
 
