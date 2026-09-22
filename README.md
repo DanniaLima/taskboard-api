@@ -13,7 +13,7 @@ This project was built as a backend portfolio piece to demonstrate REST API desi
 - Standardized error responses following **RFC 7807 (ProblemDetail)**
 - Interactive API documentation with **Swagger / OpenAPI 3**
 - DTO-based request/response contracts — the JPA entity is never exposed directly through the API
-- Unit tests for the service layer using **JUnit 5** and **Mockito**
+- Unit tests for the service and controller layers using **JUnit 5**, **Mockito**, and **MockMvc**
 
 ## Tech Stack
 
@@ -156,7 +156,10 @@ taskboard-api/
 │   │   └── resources/
 │   │       └── application.properties
 │   └── test/
-│       └── java/com/dannialima/taskboard/service/
+│       └── java/com/dannialima/taskboard/
+│           ├── controller/
+│           ├── service/
+│           └── TaskboardApiApplicationTests.java
 ├── pom.xml
 └── README.md
 ```
