@@ -35,3 +35,5 @@ build/
 .idea/
 target/
 
+application-local.properties
+.env
