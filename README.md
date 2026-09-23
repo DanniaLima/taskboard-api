@@ -1,8 +1,22 @@
 # TaskBoard API
 
+![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.x-6DB33F?style=for-the-badge&logo=springboot)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=for-the-badge&logo=docker)
+
 A RESTful Task Management API built with **Java** and **Spring Boot**, designed with clean architecture principles, DTO-based contracts, centralized exception handling, and unit test coverage.
 
 This project was built as a backend portfolio piece to demonstrate REST API design, layered architecture, and testing practices with the Spring ecosystem.
+
+## 🚀 Live Demo
+
+**Deployed on Render + Supabase PostgreSQL:**
+
+- 🔗 **Swagger UI:** [https://taskboard-api-6aml.onrender.com/swagger-ui/index.html](https://taskboard-api-6aml.onrender.com/swagger-ui/index.html)
+- 🔗 **API Base URL:** [https://taskboard-api-6aml.onrender.com/api/tasks](https://taskboard-api-6aml.onrender.com/api/tasks)
+
+> ⚠️ The free-tier instance sleeps after 15 minutes of inactivity. The first request may take up to 50 seconds to wake it up.
 
 ## Features
 
@@ -14,18 +28,22 @@ This project was built as a backend portfolio piece to demonstrate REST API desi
 - Interactive API documentation with **Swagger / OpenAPI 3**
 - DTO-based request/response contracts — the JPA entity is never exposed directly through the API
 - Unit tests for the service and controller layers using **JUnit 5**, **Mockito**, and **MockMvc**
+- Dockerized for consistent deployment
 
 ## Tech Stack
 
 | Category            | Technology                          |
-|----------------------|--------------------------------------|
-| Language             | Java 17                              |
-| Framework            | Spring Boot                          |
-| Persistence          | Spring Data JPA + MySQL              |
-| Validation           | Jakarta Bean Validation              |
-| API Documentation    | springdoc-openapi (Swagger UI)       |
-| Testing              | JUnit 5, Mockito                     |
-| Build Tool           | Maven                                |
+|---------------------|--------------------------------------|
+| Language            | Java 17                              |
+| Framework           | Spring Boot                          |
+| Persistence         | Spring Data JPA + PostgreSQL         |
+| Database (prod)     | Supabase (managed PostgreSQL)        |
+| Validation          | Jakarta Bean Validation              |
+| API Documentation   | springdoc-openapi (Swagger UI)       |
+| Testing             | JUnit 5, Mockito, MockMvc            |
+| Build Tool          | Maven                                |
+| Containerization    | Docker (multi-stage build)           |
+| Deployment          | Render                               |
 
 ## Architecture
 
@@ -36,6 +54,7 @@ Controller  →  Service  →  Repository  →  Database
     ↑              ↓
   DTOs      Entity (Task)
 ```
+
 
 - **Controller**: exposes REST endpoints, receives/returns DTOs only
 - **Service**: business logic, entity ↔ DTO conversion, exception handling
@@ -61,7 +80,7 @@ Controller  →  Service  →  Repository  →  Database
 
 | Method | Endpoint              | Description                       |
 |--------|------------------------|------------------------------------|
-| GET    | `/api/tasks`           | List all tasks (paginated, optional `status` filter) |
+| GET    | `/api/tasks`           | List tasks (paginated, optional `status` filter) |
 | GET    | `/api/tasks/{id}`      | Get a task by ID                   |
 | POST   | `/api/tasks`           | Create a new task                  |
 | PUT    | `/api/tasks/{id}`      | Update an existing task            |
@@ -103,16 +122,16 @@ cd taskboard-api
 CREATE DATABASE taskboard_db;
 ```
 
-### 3. Configure `application.properties`
+### 3. Configure your local credentials
 
-Edit `src/main/resources/application.properties` with your local MySQL credentials:
+Create `src/main/resources/application-local.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/taskboard_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-spring.datasource.username=root
-spring.datasource.password=your_password_here
-spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:postgresql://localhost:5432/taskboard_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
 ```
+This file is gitignored — your credentials never leave your machine.
 
 ### 4. Run the application
 
@@ -140,6 +159,14 @@ Tests cover both layers:
 - **Service layer** with JUnit 5 + Mockito (business logic, entity-to-DTO conversion, exception handling, repository interactions)
 - **Controller layer** with MockMvc (HTTP status codes, JSON contracts, validation errors, exception → status mapping)
 
+## Deployment
+
+The API is deployed on Render using a multi-stage Dockerfile and connects to a Supabase PostgreSQL instance.
+
+- **Build:** Docker multi-stage (`eclipse-temurin:17-jdk-alpine` → `eclipse-temurin:17-jre-alpine`)
+- **Profiles:** `local` (dev) and `prod` (deployment) — credentials loaded via environment variables
+- **CI/CD:** Automatic redeploy on every push to `main`
+
 ## Project Structure
 
 ```
@@ -154,12 +181,15 @@ taskboard-api/
 │   │   │   ├── repository/
 │   │   │   └── service/
 │   │   └── resources/
-│   │       └── application.properties
+│   │       ├── application.properties
+│   │       ├── application-local.properties (gitignored)
+│   │       └── application-prod.properties
 │   └── test/
 │       └── java/com/dannialima/taskboard/
 │           ├── controller/
 │           ├── service/
 │           └── TaskboardApiApplicationTests.java
+├── Dockerfile
 ├── pom.xml
 └── README.md
 ```
@@ -174,6 +204,8 @@ taskboard-api/
 - [x] Unit tests for the service layer
 - [x] Controller layer tests with MockMvc
 - [x] Pagination and sorting for the listing endpoint
+- [x] Dockerization
+- [x] Cloud deployment (Render + Supabase)
 
 ## Author
 
