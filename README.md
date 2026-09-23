@@ -107,7 +107,7 @@ Controller  →  Service  →  Repository  →  Database
 
 - Java 17+
 - Maven (or use the included `./mvnw` wrapper)
-- MySQL running locally
+- PostgreSQL running locally
 
 ### 1. Clone the repository
 
